@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       https://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/tx
+       https://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       " >
+    <context:annotation-config/>
+    <context:component-scan base-package="org.rsd"/>
+    <context:component-scan base-package="org.rsd.controller"/>
+    <context:component-scan base-package="org.rsd.dao.impl"/>
+    <!-- 放行了所有的静态资源-->
+    <mvc:default-servlet-handler/>
+    <!-- 执行完上一行配置后，静态资源得到释放，但是会导致Controller无法正常使用，需加上下面一行的配置-->
+    <mvc:annotation-driven/>
+
+    <bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://localhost:3306/rsd_website" />
+    <property name="username" value="root" />
+    <property name="password" value="18762712353" />
+</bean>
+
+    <bean name="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean name="factory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:mapper/*.mapper.xml" />
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+                <property name="mapUnderscoreToCamelCase" value="true" />
+                <property name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl" />
+                <property name="cacheEnabled" value="true" />
+            </bean>
+        </property>
+        <property name="plugins">   
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor" />
+            </array>
+        </property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="org.rsd.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="factory" />
+    </bean>
+    <bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+<!--    <tx:advice id="interceptor" transaction-manager="transactionManager">-->
+<!--        <tx:attributes>-->
+<!--            <tx:method name="more*"/>-->
+<!--        </tx:attributes>-->
+<!--    </tx:advice>-->
+
+<!--    <aop:config>-->
+<!--        <aop:advisor advice-ref="interceptor" pointcut="execution(* org.rsd.service.Impl.*.more*(..))"/>-->
+<!--    </aop:config>-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
