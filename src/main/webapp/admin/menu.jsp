@@ -52,7 +52,7 @@
             <span><img src="images/leftico01.png" /></span>系统设置
         </div>
         <ul class="menuson">
-            <li><cite></cite><a href="/sysUser/list" target="rightFrame">用户管理</a><i></i></li>
+            <li><cite></cite><a href="<%request.getContextPath();%>/sysUser/list" target="rightFrame">用户管理</a><i></i></li>
             <li><cite></cite><a href="/sysRole/list" target="rightFrame">角色管理</a><i></i></li>
             <li><cite></cite><a href="/sysFunction/list" target="rightFrame">功能管理</a><i></i></li>
         </ul>
